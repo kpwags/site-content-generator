@@ -80,28 +80,4 @@ public class NotionService
 
         return articles;
     }
-
-    private ReadingLogCategory GetCategoryFromNotionCategory(string category) => category switch
-    {
-        ".net" => ReadingLogCategory.DotNet,
-        "web development" => ReadingLogCategory.WebDevelopment,
-        "general development" => ReadingLogCategory.Development,
-        "design" => ReadingLogCategory.Design,
-        "technology" => ReadingLogCategory.Technology,
-        "the internet" => ReadingLogCategory.Internet,
-        "science" => ReadingLogCategory.Science,
-        "space" => ReadingLogCategory.Space,
-        "climate change" => ReadingLogCategory.ClimateChange,
-        "gaming" => ReadingLogCategory.Gaming,
-        "business & finance" => ReadingLogCategory.Business,
-        "sports" => ReadingLogCategory.Sports,
-        "podcasts" => ReadingLogCategory.Podcasts,
-        "media & entertainment" => ReadingLogCategory.Entertainment,
-        "song" => ReadingLogCategory.Song,
-        "politics" => ReadingLogCategory.Politics,
-        "health & fitness" => ReadingLogCategory.Fitness,
-        "journalism" => ReadingLogCategory.Journalism,
-        "longform" => ReadingLogCategory.Longform,
-        _ => ReadingLogCategory.Everything,
-    };
 }
