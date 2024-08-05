@@ -6,12 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SiteContentGenerator.Configuration;
+using SiteContentGenerator.Exceptions;
+using SiteContentGenerator.Services;
 
 namespace SiteContentGenerator;
 
 internal class Program
 {
     private static DirectoryConfiguration? _configuration;
+    private static NotionConfiguration? _notionConfiguration;
+    private static CategoryConfiguration? _categoryConfiguration;
     
     static async Task Main()
     {
@@ -19,12 +23,15 @@ internal class Program
     
         IConfiguration config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
+            .AddJsonFile("appsettings.development.json", true)
             .AddEnvironmentVariables()
             .Build();
         
         _configuration = config.GetRequiredSection("Directory").Get<DirectoryConfiguration>();
+        _notionConfiguration = config.GetRequiredSection("Notion").Get<NotionConfiguration>();
+        _categoryConfiguration = config.GetRequiredSection("Category").Get<CategoryConfiguration>();
 
-        if (_configuration is null)
+        if (_configuration is null || _notionConfiguration is null || _categoryConfiguration is null)
         {
             Console.WriteLine("Unable to read settings");
             return;
@@ -36,6 +43,7 @@ internal class Program
         Console.WriteLine("1. Blog Post");
         Console.WriteLine("2. Note");
         Console.WriteLine("3. Book Note");
+        Console.WriteLine("4. Reading Log");
         Console.WriteLine("");
 
         try
@@ -57,6 +65,10 @@ internal class Program
                 case ContentTemplates.BookNote:
                     await BuildBookNoteTemplate();
                     WriteConsoleSuccess("Book Note Template Created!");
+                    break;
+                case ContentTemplates.ReadingLog:
+                    await BuildReadingLog();
+                    WriteConsoleSuccess("Reading Log Created");
                     break;
                 default:
                     throw new Exception("Invalid selection");
@@ -98,7 +110,7 @@ internal class Program
         
         var rssOnlyResponse = Utilities.GetString("Is the Post RSS only? (yes/no) (no)");
 
-        var isRssOnly = (rssOnlyResponse ?? "").ToLower(CultureInfo.InvariantCulture) == "yes";
+        var isRssOnly = rssOnlyResponse.ToLower(CultureInfo.InvariantCulture) == "yes";
         
         Console.WriteLine("");
 
@@ -300,6 +312,54 @@ internal class Program
         var outputFile = Path.Join(outputDirectory, fileName);
 
         await WriteToFile(stringBuilder.ToString(), outputFile);
+    }
+
+    static async Task BuildReadingLog()
+    {
+        if (_notionConfiguration is null)
+        {
+            throw new NullReferenceException("Notion configuration is not defined");
+        }
+        
+        if (_categoryConfiguration is null || _categoryConfiguration.Categories.Count == 0)
+        {
+            throw new NullReferenceException("Category configuration is not defined");
+        }
+        
+        Console.Write("Please Enter Reading Log Number: ");
+
+        var logNumberString = Console.ReadLine();
+
+        if (!int.TryParse(logNumberString, out int logNumber) || logNumber == 0)
+        {
+            throw new InvalidInputException("Invalid reading log issue number");
+        }
+        
+        var notionService = new NotionService(_notionConfiguration);
+        
+        var articles = await notionService.GetReadingLogArticles(logNumber);
+
+        if (articles.Count == 0)
+        {
+            WriteWithColor($"No links found for Issue #{logNumber}", ConsoleColor.Yellow);
+            return;
+        }
+
+        var markdownGenerator = new ReadingLogMarkdownGenerator(_categoryConfiguration);
+        var markdown = markdownGenerator.GetMarkdownString(articles, logNumber);
+        
+        var fileName = $"{logNumber}.md";
+
+        var outputDirectory = Path.Join(_configuration?.RootContentDirectory, _configuration?.ReadingLogs);
+
+        if (!Directory.Exists(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        var outputFile = Path.Join(outputDirectory, fileName);
+
+        await WriteToFile(markdown, outputFile);
     }
     
     static string BuildUrlSlug(string title)

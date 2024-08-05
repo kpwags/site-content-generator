@@ -9,4 +9,6 @@ public class DirectoryConfiguration
     public string Notes { get; set; } = string.Empty;
     
     public string BookNotes { get; set; } = string.Empty;
+    
+    public string ReadingLogs { get; set; } = string.Empty;
 }
