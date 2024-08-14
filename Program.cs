@@ -1,20 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SiteContentGenerator.Configuration;
 using SiteContentGenerator.Exceptions;
+using SiteContentGenerator.Models;
 using SiteContentGenerator.Services;
+using Link = SiteContentGenerator.Models.Link;
 
 namespace SiteContentGenerator;
 
 internal class Program
 {
     private static DirectoryConfiguration? _configuration;
-    private static NotionConfiguration? _notionConfiguration;
+    private static ApiConfiguration? _apiConfiguration;
     private static CategoryConfiguration? _categoryConfiguration;
     
     static async Task Main()
@@ -23,15 +28,14 @@ internal class Program
     
         IConfiguration config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
-            .AddJsonFile("appsettings.development.json", true)
             .AddEnvironmentVariables()
             .Build();
         
         _configuration = config.GetRequiredSection("Directory").Get<DirectoryConfiguration>();
-        _notionConfiguration = config.GetRequiredSection("Notion").Get<NotionConfiguration>();
+        _apiConfiguration = config.GetRequiredSection("Api").Get<ApiConfiguration>();
         _categoryConfiguration = config.GetRequiredSection("Category").Get<CategoryConfiguration>();
 
-        if (_configuration is null || _notionConfiguration is null || _categoryConfiguration is null)
+        if (_configuration is null || _apiConfiguration is null || _categoryConfiguration is null)
         {
             Console.WriteLine("Unable to read settings");
             return;
@@ -316,9 +320,9 @@ internal class Program
 
     static async Task BuildReadingLog()
     {
-        if (_notionConfiguration is null)
+        if (_apiConfiguration is null)
         {
-            throw new NullReferenceException("Notion configuration is not defined");
+            throw new NullReferenceException("API configuration is not defined");
         }
         
         if (_categoryConfiguration is null || _categoryConfiguration.Categories.Count == 0)
@@ -335,9 +339,35 @@ internal class Program
             throw new InvalidInputException("Invalid reading log issue number");
         }
         
-        var notionService = new NotionService(_notionConfiguration);
+        var handler = new HttpClientHandler();
+        handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+        handler.ServerCertificateCustomValidationCallback = 
+            (_, _, _, _) =>
+            {
+                return true;
+            };
+
+        var client = new HttpClient(handler);
         
-        var articles = await notionService.GetReadingLogArticles(logNumber);
+        var links =
+            await client.GetFromJsonAsync<IReadOnlyCollection<Link>>(
+                $"{_apiConfiguration.ApiRootUrl}/api/download/reading-log-links?readingLogIssue={logNumber}");
+
+        if (links is null)
+        {
+            WriteConsoleError("Error retrieving links from media repository");
+            return;
+        }
+
+        var articles = links
+            .Select(l => new Article
+            {
+                Category = l.LinkCategory.Name,
+                Title = l.Title,
+                Author = l.Author,
+                Url = l.Url,
+            })
+            .ToList();
 
         if (articles.Count == 0)
         {
