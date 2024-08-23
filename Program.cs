@@ -193,6 +193,8 @@ internal class Program
             slug = urlSlug;
         }
         
+        var tags = Utilities.GetTagInput("Enter Tags (Separated by Commas)");
+        
         Console.WriteLine("");
 
         var stringBuilder = new StringBuilder();
@@ -202,6 +204,17 @@ internal class Program
         stringBuilder.AppendLine($"date: '{utcDateTime}'");
         stringBuilder.AppendLine($"link: {link}");
         stringBuilder.AppendLine($"permalink: /notes/{slug}/index.html");
+        
+        if (tags.Count > 0)
+        {
+            stringBuilder.AppendLine("tags:");
+
+            foreach (var tag in tags)
+            {
+                stringBuilder.AppendLine($"  - {tag}");
+            }
+        }
+        
         stringBuilder.AppendLine("---");
 
         var fileName = $"{slug}.md";
