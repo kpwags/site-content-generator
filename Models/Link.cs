@@ -20,7 +20,7 @@ public class Link
     
     public int ReadingLogIssueNumber { get; set; }
 
-    public LinkType LinkType { get; set; } = new();
+    public LinkType Type { get; set; } = new();
     
-    public LinkCategory LinkCategory { get; set; } = new();
+    public LinkCategory Category { get; set; } = new();
 }
