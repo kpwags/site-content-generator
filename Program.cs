@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SiteContentGenerator.Configuration;
@@ -364,7 +365,10 @@ internal class Program
         
         var links =
             await client.GetFromJsonAsync<IReadOnlyCollection<Link>>(
-                $"{_apiConfiguration.ApiRootUrl}/api/download/reading-log-links?readingLogIssue={logNumber}");
+                $"{_apiConfiguration.ApiRootUrl}/link/reading-log/{logNumber}", new JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
 
         if (links is null)
         {
@@ -375,7 +379,7 @@ internal class Program
         var articles = links
             .Select(l => new Article
             {
-                Category = l.LinkCategory.Name,
+                Category = l.Category.Name,
                 Title = l.Title,
                 Author = l.Author,
                 Url = l.Url,
