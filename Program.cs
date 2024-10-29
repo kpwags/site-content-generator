@@ -185,6 +185,14 @@ internal class Program
             return;
         }
         
+        var author = Utilities.GetString("Enter Author");
+
+        if (string.IsNullOrWhiteSpace(author))
+        {
+            WriteConsoleError("Author Not Specified");
+            return;
+        }
+        
         var urlSlug = BuildUrlSlug(title);
         
         var slug = Utilities.GetString($"Enter Permalink ({urlSlug})");
@@ -204,6 +212,7 @@ internal class Program
         stringBuilder.AppendLine($"title: \"{title}\"");
         stringBuilder.AppendLine($"date: '{utcDateTime}'");
         stringBuilder.AppendLine($"link: {link}");
+        stringBuilder.AppendLine($"author: {author}");
         stringBuilder.AppendLine($"permalink: /notes/{slug}/index.html");
         
         if (tags.Count > 0)
