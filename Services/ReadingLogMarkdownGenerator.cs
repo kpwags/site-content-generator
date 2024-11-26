@@ -42,10 +42,10 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
             
                     foreach (var article in podcasts)
                     {
-                        _markdownBuilder.AppendLine($"[{article.Author}: {article.Title}]({article.Url})");
-                        _markdownBuilder.AppendLine("");
+                        _markdownBuilder.AppendLine($"- [{article.Author}: {article.Title}]({article.Url})"); 
                     }
             
+                    _markdownBuilder.AppendLine("");
                     _markdownBuilder.AppendLine("---");
                     _markdownBuilder.AppendLine("");
                 }
@@ -78,6 +78,7 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
             
             AddLinks(categoryArticles);
             
+            _markdownBuilder.AppendLine("");
             _markdownBuilder.AppendLine("---");
             _markdownBuilder.AppendLine("");
         }
@@ -87,8 +88,7 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
     {
         foreach (var article in articles)
         {
-            _markdownBuilder.AppendLine($"[{article.Title}]({article.Url}) - *{article.Author}*");
-            _markdownBuilder.AppendLine("");
+            _markdownBuilder.AppendLine($"- [{article.Title}]({article.Url}) - *{article.Author}*");
         }
     }
 }
