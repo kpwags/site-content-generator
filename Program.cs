@@ -271,6 +271,14 @@ internal class Program
             WriteConsoleError("Image URL Not Specified");
             return;
         }
+        
+        var format = Utilities.GetString("Enter Format");
+
+        if (string.IsNullOrWhiteSpace(format))
+        {
+            WriteConsoleError("Format Not Specified");
+            return;
+        }
 
         var dateFinished = Utilities.GetDateTime("Enter Date Read");
 
@@ -303,13 +311,19 @@ internal class Program
         if (!string.IsNullOrWhiteSpace(subtitle))
         {
             stringBuilder.AppendLine($"subtitle: \"{subtitle}\"");
+            stringBuilder.AppendLine($"fullTitle: \"{title}: {subtitle}\"");
+        }
+        else
+        {
+            stringBuilder.AppendLine($"fullTitle: \"{title}\"");
         }
         
         stringBuilder.AppendLine($"author: \"{author}\"");
-        stringBuilder.AppendLine($"coverImage: {imageUrl}");
+        stringBuilder.AppendLine($"format: '{format}'");
+        stringBuilder.AppendLine($"coverImage: '{imageUrl}'");
         stringBuilder.AppendLine($"rating: {rating}");
         stringBuilder.AppendLine($"date: '{dateFinished.ToString("yyyy-MM-dd")}'");
-        stringBuilder.AppendLine($"permalink: /books/{slug}/index.html");
+        stringBuilder.AppendLine($"permalink: '/books/{slug}/index.html'");
         
         if (categories.Count > 0)
         {
