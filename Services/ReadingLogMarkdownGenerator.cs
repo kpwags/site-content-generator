@@ -11,11 +11,11 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
 {
     private readonly CategoryConfiguration _categoryConfiguration = categoryConfiguration;
     private readonly StringBuilder _markdownBuilder = new StringBuilder();
-    
+
     public string GetMarkdownString(List<Article> articles, int logNumber)
     {
         var utcDateTime = string.Format("{0:yyyy-MM-ddTHH:mm:ss.FFFZ}", DateTime.UtcNow);
-        
+
         _markdownBuilder.AppendLine("---");
         _markdownBuilder.AppendLine($"title: 'Reading Log - {DateTime.Now.ToString("MMMM d, yyyy")} (#{logNumber})'");
         _markdownBuilder.AppendLine($"date: '{utcDateTime}'");
@@ -23,28 +23,28 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
         _markdownBuilder.AppendLine("tags:");
         _markdownBuilder.AppendLine("  - Reading Log");
         _markdownBuilder.AppendLine("---");
-        
+
         _markdownBuilder.AppendLine("");
         _markdownBuilder.AppendLine("Introduction Text");
         _markdownBuilder.AppendLine("<!-- excerpt -->");
         _markdownBuilder.AppendLine("");
 
-        foreach (var category in _categoryConfiguration.Categories)
+        foreach (var category in _categoryConfiguration.Categories.OrderBy(c => c.SortOrder))
         {
             if (category.Name == "Podcasts")
             {
                 var podcasts = articles.Where(a => a.Category == "Podcasts").ToList();
-                
+
                 if (podcasts.Count > 0)
                 {
-                    _markdownBuilder.AppendLine($"## {category.Icon} {category.Name}");
+                    _markdownBuilder.AppendLine($"## {category.Name}");
                     _markdownBuilder.AppendLine("");
-            
+
                     foreach (var article in podcasts)
                     {
-                        _markdownBuilder.AppendLine($"- [{article.Author}: {article.Title}]({article.Url})"); 
+                        _markdownBuilder.AppendLine($"- [{article.Author}: {article.Title}]({article.Url})");
                     }
-            
+
                     _markdownBuilder.AppendLine("");
                     _markdownBuilder.AppendLine("---");
                     _markdownBuilder.AppendLine("");
@@ -55,10 +55,10 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
                 AddSection(articles, category);
             }
         }
-        
-        _markdownBuilder.AppendLine("## 🎵 A Song to Leave You With");
+
+        _markdownBuilder.AppendLine("## A Song to Leave You With");
         _markdownBuilder.AppendLine("");
-        
+
         _markdownBuilder.AppendLine("<h3 class=\"music\">Artist - Song</h3>");
         _markdownBuilder.AppendLine("");
         _markdownBuilder.AppendLine($"{{% youTubeEmbed \"\" \"\" %}}");
@@ -66,18 +66,18 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
 
         return _markdownBuilder.ToString();
     }
-    
+
     private void AddSection(List<Article> articles, Category category)
     {
         var categoryArticles = articles.Where(a => a.Category == category.Name).ToList();
-        
+
         if (categoryArticles.Count > 0)
         {
-            _markdownBuilder.AppendLine($"## {category.Icon} {category.Name}");
+            _markdownBuilder.AppendLine($"## {category.Name}");
             _markdownBuilder.AppendLine("");
-            
+
             AddLinks(categoryArticles);
-            
+
             _markdownBuilder.AppendLine("");
             _markdownBuilder.AppendLine("---");
             _markdownBuilder.AppendLine("");
