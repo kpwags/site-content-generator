@@ -28,6 +28,8 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
         _markdownBuilder.AppendLine("Introduction Text");
         _markdownBuilder.AppendLine("<!-- excerpt -->");
         _markdownBuilder.AppendLine("");
+        _markdownBuilder.AppendLine("---");
+        _markdownBuilder.AppendLine("");
 
         foreach (var category in _categoryConfiguration.Categories.OrderBy(c => c.SortOrder))
         {
@@ -59,7 +61,7 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
         _markdownBuilder.AppendLine("## A Song to Leave You With");
         _markdownBuilder.AppendLine("");
 
-        _markdownBuilder.AppendLine("<h3 class=\"music\">Artist - Song</h3>");
+        _markdownBuilder.AppendLine("### Artist - Song");
         _markdownBuilder.AppendLine("");
         _markdownBuilder.AppendLine($"{{% youTubeEmbed \"\" \"\" %}}");
         _markdownBuilder.AppendLine("");
