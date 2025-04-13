@@ -445,7 +445,7 @@ internal class Program
         Console.WriteLine("");
 
         var weekNotesStart = Utilities.GetDateTime("Enter Start Date");
-        var weekNotesEnd = weekNotesStart.AddDays(7);
+        var weekNotesEnd = weekNotesStart.AddDays(6);
 
         var title = weekNotesStart.Month == weekNotesEnd.Month ? $"Week Notes for {weekNotesStart:M} - {weekNotesEnd.Day}" : $"Week Notes for {weekNotesStart:M} - {weekNotesEnd:M}";
 
