@@ -6,4 +6,5 @@ public enum ContentTemplates
     Note = 2,
     BookNote = 3,
     ReadingLog = 4,
+    WeekNotes = 5,
 }
