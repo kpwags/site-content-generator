@@ -50,6 +50,7 @@ internal class Program
         Console.WriteLine("3. Book Note");
         Console.WriteLine("4. Reading Log");
         Console.WriteLine("5. Week Notes");
+        Console.WriteLine("6. Monthly Check-In");
         Console.WriteLine("");
 
         try
@@ -79,6 +80,10 @@ internal class Program
                 case ContentTemplates.WeekNotes:
                     await BuildWeekNotesTemplate();
                     WriteConsoleSuccess("Week Notes Post Created");
+                    break;
+                case ContentTemplates.MonthlyCheckIn:
+                    await BuildMonthlyCheckInTemplate();
+                    WriteConsoleSuccess("Monthly Check-In Post Created");
                     break;
                 default:
                     throw new Exception("Invalid selection");
@@ -481,6 +486,99 @@ internal class Program
         stringBuilder.AppendLine("---");
 
         var fileName = $"{DateTime.UtcNow.ToString("yyyy")}-{DateTime.UtcNow.ToString("MM")}-{DateTime.UtcNow.ToString("dd")}-week-notes.md";
+
+        var outputDirectory = Path.Join(_configuration?.RootContentDirectory, _configuration?.Blog, DateTime.UtcNow.ToString("yyyy"));
+
+        if (!Directory.Exists(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        var outputFile = Path.Join(outputDirectory, fileName);
+
+        await WriteToFile(stringBuilder.ToString(), outputFile);
+    }
+
+    static async Task BuildMonthlyCheckInTemplate()
+    {
+        var utcDateTime = string.Format("{0:yyyy-MM-ddTHH:mm:ss.FFFZ}", DateTime.UtcNow);
+
+        WriteWithColor("Building Monthly Check-In Template", ConsoleColor.Magenta);
+        Console.WriteLine("");
+
+        var monthAndYear = Utilities.GetString("Enter Month & Year");
+
+        var title = $"{monthAndYear} Check-In";
+
+        var description = $"Looking back at my {monthAndYear}.";
+
+        var tags = Utilities.GetTagInput("Enter Tags (Separated by Commas)");
+
+        var urlSlug = BuildUrlSlug(title);
+
+        Console.WriteLine("");
+
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.AppendLine("---");
+        stringBuilder.AppendLine($"title: \"{title}\"");
+        stringBuilder.AppendLine($"date: '{utcDateTime}'");
+        stringBuilder.AppendLine($"permalink: /posts/{DateTime.UtcNow.ToString("yyyy")}/{DateTime.UtcNow.ToString("MM")}/{DateTime.UtcNow.ToString("dd")}/{urlSlug}/index.html");
+
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            stringBuilder.AppendLine($"description: \"{description}\"");
+        }
+
+        stringBuilder.AppendLine("tags:");
+        stringBuilder.AppendLine($"  - Monthly Check-In");
+
+        if (tags.Count > 0)
+        {
+            foreach (var tag in tags)
+            {
+                stringBuilder.AppendLine($"  - {tag}");
+            }
+        }
+
+        stringBuilder.AppendLine("---");
+
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("{% renderTemplate \"webc\" %}");
+        stringBuilder.AppendLine("<monthly-roundup runs=\"0\" milesran=\"0\" walks=\"0\" mileswalked=\"0\" lifts=\"0\" volumelifted=\"0\" gaming=\"true\" tv=\"true\" movies=\"true\">");
+        stringBuilder.AppendLine("  <ul slot=\"books-read\">");
+        stringBuilder.AppendLine("    <li>Finished <a href=\"LINK\">TITLE</a> by AUTHOR</li>");
+        stringBuilder.AppendLine("    <li>Started <a href=\"LINK\">TITLE</a> by AUTHOR</li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"reading-logs\">");
+        stringBuilder.AppendLine("    <li><a href=\"https://kpwags.com/reading-log/105/\"> (#)</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"week-notes\">");
+        stringBuilder.AppendLine("    <li><a href=\"https://kpwags.com/posts/2025/01/05/week-notes/\">DATES</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"blogging\">");
+        stringBuilder.AppendLine("    <li><a href=\"https://kpwags.com/posts/LINK/\">TITLE</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"gaming\">");
+        stringBuilder.AppendLine("    <li>Continued <a href=\"LINK\">TITLE</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"tv\">");
+        stringBuilder.AppendLine("    <li>Continued <a href=\"LINK\">TITLE</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("");
+        stringBuilder.AppendLine("  <ul slot=\"movies\">");
+        stringBuilder.AppendLine("    <li><a href=\"LINK\">TITLE</a></li>");
+        stringBuilder.AppendLine("  </ul>");
+        stringBuilder.AppendLine("</monthly-roundup>");
+        stringBuilder.AppendLine("{% endrenderTemplate %}");
+        stringBuilder.AppendLine("");
+
+        var fileName = $"{DateTime.UtcNow.ToString("yyyy")}-{DateTime.UtcNow.ToString("MM")}-{DateTime.UtcNow.ToString("dd")}-{urlSlug}.md";
 
         var outputDirectory = Path.Join(_configuration?.RootContentDirectory, _configuration?.Blog, DateTime.UtcNow.ToString("yyyy"));
 
