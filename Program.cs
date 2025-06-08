@@ -452,9 +452,13 @@ internal class Program
         var weekNotesStart = Utilities.GetDateTime("Enter Start Date");
         var weekNotesEnd = weekNotesStart.AddDays(6);
 
-        var title = weekNotesStart.Month == weekNotesEnd.Month ? $"Week Notes for {weekNotesStart:M} - {weekNotesEnd.Day}" : $"Week Notes for {weekNotesStart:M} - {weekNotesEnd:M}";
+        var weekNoteIssueNumber = Utilities.GetInteger("Enter Week Note Issue Number");
 
-        var description = $"My week notes for the week of {weekNotesStart:M} through {weekNotesEnd:M}";
+        var title = weekNotesStart.Month == weekNotesEnd.Month
+            ? $"Week Notes for {weekNotesStart:M} - {weekNotesEnd.Day} (#{weekNoteIssueNumber})"
+            : $"Week Notes for {weekNotesStart:M} - {weekNotesEnd:M}  (#{weekNoteIssueNumber})";
+
+        var description = $"My week notes for the week of {weekNotesStart:M} through {weekNotesEnd:M}.";
 
         var tags = Utilities.GetTagInput("Enter Tags (Separated by Commas)");
 
@@ -465,17 +469,12 @@ internal class Program
         stringBuilder.AppendLine("---");
         stringBuilder.AppendLine($"title: \"{title}\"");
         stringBuilder.AppendLine($"date: '{utcDateTime}'");
-        stringBuilder.AppendLine($"permalink: /posts/{DateTime.UtcNow.ToString("yyyy")}/{DateTime.UtcNow.ToString("MM")}/{DateTime.UtcNow.ToString("dd")}/week-notes/index.html");
-
-        if (!string.IsNullOrWhiteSpace(description))
-        {
-            stringBuilder.AppendLine($"description: \"{description}\"");
-        }
+        stringBuilder.AppendLine($"permalink: /week-notes/{weekNoteIssueNumber}/index.html");
+        stringBuilder.AppendLine($"description: \"{description}\"");
 
         if (tags.Count > 0)
         {
             stringBuilder.AppendLine("tags:");
-            stringBuilder.AppendLine($"  - Week Notes");
 
             foreach (var tag in tags)
             {
@@ -484,10 +483,14 @@ internal class Program
         }
 
         stringBuilder.AppendLine("---");
+        stringBuilder.AppendLine(description);
+        stringBuilder.AppendLine("<!-- excerpt -->");
+        stringBuilder.AppendLine("");
 
-        var fileName = $"{DateTime.UtcNow.ToString("yyyy")}-{DateTime.UtcNow.ToString("MM")}-{DateTime.UtcNow.ToString("dd")}-week-notes.md";
 
-        var outputDirectory = Path.Join(_configuration?.RootContentDirectory, _configuration?.Blog, DateTime.UtcNow.ToString("yyyy"));
+        var fileName = $"{weekNoteIssueNumber}.md";
+
+        var outputDirectory = Path.Join(_configuration?.RootContentDirectory, _configuration?.WeekNotes);
 
         if (!Directory.Exists(outputDirectory))
         {
