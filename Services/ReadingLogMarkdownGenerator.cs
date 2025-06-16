@@ -12,7 +12,7 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
     private readonly CategoryConfiguration _categoryConfiguration = categoryConfiguration;
     private readonly StringBuilder _markdownBuilder = new StringBuilder();
 
-    public string GetMarkdownString(List<Article> articles, int logNumber)
+    public string GetMarkdownString(List<Article> articles, int logNumber, string youtubeId = "", string artist = "" , string songTitle = "")
     {
         var utcDateTime = string.Format("{0:yyyy-MM-ddTHH:mm:ss.FFFZ}", DateTime.UtcNow);
 
@@ -61,10 +61,20 @@ public class ReadingLogMarkdownGenerator(CategoryConfiguration categoryConfigura
         _markdownBuilder.AppendLine("## A Song to Leave You With");
         _markdownBuilder.AppendLine("");
 
-        _markdownBuilder.AppendLine("### Artist - Song");
-        _markdownBuilder.AppendLine("");
-        _markdownBuilder.AppendLine($"{{% youTubeEmbed \"\" \"\" %}}");
-        _markdownBuilder.AppendLine("");
+        if (string.IsNullOrWhiteSpace(youtubeId) || string.IsNullOrWhiteSpace(artist) || string.IsNullOrWhiteSpace(songTitle))
+        {
+            _markdownBuilder.AppendLine("### Artist - Song");
+            _markdownBuilder.AppendLine("");
+            _markdownBuilder.AppendLine($"{{% youTubeEmbed \"\" \"\" %}}");
+            _markdownBuilder.AppendLine("");
+        }
+        else
+        {
+            _markdownBuilder.AppendLine($"### {artist} - {songTitle}");
+            _markdownBuilder.AppendLine("");
+            _markdownBuilder.AppendLine($"{{% youTubeEmbed \"{youtubeId}\" \"{artist} - {songTitle}\" %}}");
+            _markdownBuilder.AppendLine("");
+        }
 
         return _markdownBuilder.ToString();
     }

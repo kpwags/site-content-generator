@@ -386,6 +386,10 @@ internal class Program
             throw new InvalidInputException("Invalid reading log issue number");
         }
 
+        var youTubeId = Utilities.GetString("Enter YouTube ID");
+        var artist = Utilities.GetString("Enter Artist");
+        var songTitle = Utilities.GetString("Enter Song Title");
+
         var handler = new HttpClientHandler();
         handler.ClientCertificateOptions = ClientCertificateOption.Manual;
         handler.ServerCertificateCustomValidationCallback =
@@ -426,7 +430,7 @@ internal class Program
         }
 
         var markdownGenerator = new ReadingLogMarkdownGenerator(_categoryConfiguration);
-        var markdown = markdownGenerator.GetMarkdownString(articles, logNumber);
+        var markdown = markdownGenerator.GetMarkdownString(articles, logNumber, youTubeId, artist, songTitle);
 
         var fileName = $"{logNumber}.md";
 
