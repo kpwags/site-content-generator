@@ -473,7 +473,7 @@ internal class Program
         stringBuilder.AppendLine("---");
         stringBuilder.AppendLine($"title: \"{title}\"");
         stringBuilder.AppendLine($"date: '{utcDateTime}'");
-        stringBuilder.AppendLine($"permalink: /week-notes/{weekNoteIssueNumber}/index.html");
+        stringBuilder.AppendLine($"permalink: /week-note/{weekNoteIssueNumber}/index.html");
         stringBuilder.AppendLine($"description: \"{description}\"");
 
         if (tags.Count > 0)
