@@ -552,7 +552,7 @@ internal class Program
 
         stringBuilder.AppendLine("");
         stringBuilder.AppendLine("{% renderTemplate \"webc\" %}");
-        stringBuilder.AppendLine("<monthly-roundup runs=\"0\" milesran=\"0\" walks=\"0\" mileswalked=\"0\" lifts=\"0\" volumelifted=\"0\" gaming=\"true\" tv=\"true\" movies=\"true\">");
+        stringBuilder.AppendLine("<monthly-roundup runs=\"0\" milesran=\"0\" walks=\"0\" mileswalked=\"0\" lifts=\"0\" volumelifted=\"0\" bikes=\"0\" milesrode=\"0\" gaming=\"true\" tv=\"true\" movies=\"true\">");
         stringBuilder.AppendLine("  <ul slot=\"books-read\">");
         stringBuilder.AppendLine("    <li>Finished <a href=\"LINK\">TITLE</a> by AUTHOR</li>");
         stringBuilder.AppendLine("    <li>Started <a href=\"LINK\">TITLE</a> by AUTHOR</li>");
@@ -563,7 +563,7 @@ internal class Program
         stringBuilder.AppendLine("  </ul>");
         stringBuilder.AppendLine("");
         stringBuilder.AppendLine("  <ul slot=\"week-notes\">");
-        stringBuilder.AppendLine("    <li><a href=\"https://kpwags.com/posts/2025/01/05/week-notes/\">DATES</a></li>");
+        stringBuilder.AppendLine("    <li><a href=\"https://kpwags.com/week-note/XX/\">DATES (#)</a></li>");
         stringBuilder.AppendLine("  </ul>");
         stringBuilder.AppendLine("");
         stringBuilder.AppendLine("  <ul slot=\"blogging\">");
